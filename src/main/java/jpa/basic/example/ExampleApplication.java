@@ -30,6 +30,9 @@ public class ExampleApplication {
 // 실제 SQL 쿼리가 나가는 시점은 transaction이 커밋 되는 시점이다
 // ex. persist로 1차 캐시에 저장되는 시점에 insert SQL을 만들어 쓰기 지연 SQL 저장소라는 공간에도 쌓아 놓는다
 // 이 SQL들은 transaction 커밋 시점에 flush 되면서 DB에 나가게 된다
+// *예외적으로 기본키 생성 전략이 IDENTITY이면 insert 돼야 PK를 알 수 있다. 
+// 따라서  영속성 컨텍스트에 등록 가능하기 위해 persist 호출 시점에 지연하지 않고 바로 DB에 쿼리를 날린다.(pk를 가져오기 위함)
+
 
 // 변경 감지 (dirty checking)
 // 엔티티를 수정시 이용할 수 있는 기능

@@ -15,12 +15,12 @@ public class MemberRepository {
 	public Long createMember() {
 		Member member = new Member();
 		
-		member.setId(1L);
-		member.setName("nameA");
+		// member.setId(1L);
+		member.setUsername("nameA");
 		
-		em.persist(member);
+		em.persist(member); // 기본키 생성 전략이 IDENTITY이면 이 시점에 쿼리를 던지고
 		
-		return member.getId(); 
+		return member.getId(); // transaction 커밋 전에 id를 가져올 수 있다
 	}
 	
 }
