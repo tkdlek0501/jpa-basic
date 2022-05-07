@@ -22,12 +22,13 @@ public class Team {
 	private Long id;
 	private String name;
 	
-	@OneToMany(mappedBy = "team") // 어떤 이름으로 mapping이 되어있는지 mappedBy로 설정해줘야 한다 
+	@OneToMany(mappedBy = "team") // 어떤 이름으로 mapping이 되어있는지 mappedBy로 설정해줘야 한다; member는 Team 객체를 'team'이란 이름의 참조 필드로 가지고 있음 
 	private List<Member> members = new ArrayList<>();
 	
 	// TODO: 양방향 연관관계
 	// 단방향 설계가 더 알아보기는 쉽다. 양방향은 꼭 필요한 경우에 추가해주는 것이 좋음
 	// TODO: mappedBy 의 개념
+	// 어떤 이름으로 매핑(참조) 되었는지 설정
 	// 객체와 테이블간에 연관관계를 맺는 차이를 풀기 위한 jpa의 기능,
 	// 객체의 연관관계는 참조 형태로 회원 -> 팀, 팀 -> 회원의 2개의 관계(2개의 단방향을 양방향이라 부름)
 	// 테이블의 연관관계는 FK를 이용해서 회원 <-> 팀 1개의 관계 (기본적으로 양방향)
