@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -45,6 +46,10 @@ public class Member {
 		this.team = team;
 		team.getMembers().add(this);// 반대쪽도 setting을 해준다		
 	}
+	
+	@OneToOne
+	@JoinColumn(name = "locker_id")
+	private Locker locker;
 	
 	private Integer age;
 	
