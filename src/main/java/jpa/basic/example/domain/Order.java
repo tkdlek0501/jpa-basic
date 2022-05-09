@@ -20,11 +20,11 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-//@Entity
+@Entity
 @Table(name = "ORDERS") // DB에는 보통 order가 예약어라서 s 붙여줌
 @Getter
 @Setter
-public class Order {
+public class Order extends BaseEntity{
 	
 	@Id @GeneratedValue
 	@Column(name = "order_id")

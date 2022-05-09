@@ -15,10 +15,10 @@ import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
-//@Entity
+@Entity
 @Getter
 @Setter
-public class Category {
+public class Category extends BaseEntity{
 	
 	@Id
 	@GeneratedValue

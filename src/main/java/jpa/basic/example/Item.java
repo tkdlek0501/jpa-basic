@@ -10,7 +10,7 @@ import javax.persistence.InheritanceType;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
+//@Entity
 @Getter
 @Setter
 //@Inheritance(strategy = InheritanceType.SINGLE_TABLE)

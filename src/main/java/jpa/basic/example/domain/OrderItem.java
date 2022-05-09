@@ -11,10 +11,10 @@ import javax.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
-//@Entity
+@Entity
 @Getter
 @Setter
-public class OrderItem {
+public class OrderItem extends BaseEntity{
 	
 	@Id @GeneratedValue
 	@Column(name = "order_item_id")
