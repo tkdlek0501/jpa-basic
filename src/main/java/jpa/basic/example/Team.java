@@ -12,10 +12,10 @@ import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
-// @Entity
+@Entity
 @Getter
 @Setter
-public class Team {
+public class Team extends BaseEntity{
 	
 	@Id @GeneratedValue
 	@Column(name = "team_id")

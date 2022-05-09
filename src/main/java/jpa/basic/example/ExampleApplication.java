@@ -9,6 +9,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ExampleApplication {
 	
 	public static void main(String[] args) {
+		
+		Album album = Album.createBuilder()
+				.name("앨범 이름")
+				.price(10000)
+				.artist("앨범 가수")
+				.build();
+		
+		System.out.println("album : " + album);
+		
 		SpringApplication.run(ExampleApplication.class, args);
 	}
 

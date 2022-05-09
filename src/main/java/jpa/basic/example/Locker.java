@@ -8,7 +8,7 @@ import javax.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
-// @Entity
+@Entity
 @Getter
 @Setter
 public class Locker {
