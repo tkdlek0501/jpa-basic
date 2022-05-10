@@ -23,4 +23,16 @@ public class MemberRepository {
 		return member.getId(); // transaction 커밋 전에 id를 가져올 수 있다
 	}
 	
+	public void createParentWithChild() {
+		
+		Child child1 = new Child();
+		Child child2 = new Child();
+		
+		Parent parent = new Parent();
+		parent.addChild(child1);
+		parent.addChild(child2);
+		
+		em.persist(parent);
+	}
+	
 }
