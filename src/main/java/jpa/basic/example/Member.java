@@ -20,7 +20,7 @@ import javax.persistence.TemporalType;
 import lombok.Getter;
 import lombok.Setter;
 
-//@Entity // jpa가 관리하는 클래스라는 것을 인식 시킴
+@Entity // jpa가 관리하는 클래스라는 것을 인식 시킴
 @Getter
 @Setter
 public class Member {
@@ -48,9 +48,9 @@ public class Member {
 		team.getMembers().add(this);// 반대쪽도 setting을 해준다		
 	}
 	
-	@OneToOne
-	@JoinColumn(name = "locker_id")
-	private Locker locker;
+//	@OneToOne
+//	@JoinColumn(name = "locker_id")
+//	private Locker locker;
 	
 	private Integer age;
 	

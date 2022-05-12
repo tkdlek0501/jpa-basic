@@ -41,6 +41,9 @@ public class MemberRepository {
 		em.persist(parent);
 	}
 	
+	// TODO: JPQL 정리
+	// 아래 모든 내용
+	
 	public void findMember() {
 		
 		List<Member> result = em.createQuery(
@@ -141,7 +144,101 @@ public class MemberRepository {
 		
 		// 외부 조인
 		String outQuery = "select m, t from Member m left join Team t on m.usernmae = t.name";
+	}
+	
+	public void subQuery() {
+		// ex. 나이가 평균보다 많은 회원
+		// select m from Member m where m.age > (select avg(m2.age) from Member m2)
 		
+		// ex. 한 건이라도 주문한 고객
+		// select m from Member m where (select count(o) from Order o where m = o.member) > 0
+	
+		// ex. 팀 A 소속인 회원 (exists : 서브쿼리에 결과가 존재하면 참)
+		// select m from Member m where exists (select t from m.team t where t.name = '팀A')
 		
+		// ex. 전체 상품 각각의 재고보다 주문량이 많은 주문들(ALL : 모두 만족하면 참)
+		// select o from Order o where o.orderAmount > ALL (select p.stockAmount from Product p)
+	
+		// 어떤 팀이든 팀에 소속된 회원(ANY : 조건을 하나라도 만족하면 참)
+		// select m from Member m where m.team = ANY (select t from Team t)
+	
+		// JPA에서는 WHERE, HAVING 절에서만 서브 쿼리 사용 가능
+		// SELECT 절도 가능 (하이버네이트에서 지원)
+		// FROM 절 서브 쿼리는 불가능 -> join 으로 풀 수 있으면 풀어서 해결해야 한다 -> 안되면 쿼리 두 번으로 처리 / 애플리케이션으로 끌어와서 처리 -> 안되면 native 쓰든지 아니면 mybatis 등 
+	}
+	
+	// 타입
+	public void type() {
+		Team team = new Team();
+		team.setName("teamA");
+		em.persist(team);
+		
+		Member member = new Member();
+		member.setAge(10);
+		member.setUsername("member1");
+		member.changeTeam(team);
+		em.persist(member);
+		
+		// 여러 타입 조회
+		// 1. Query 타입으로 조회
+//		Query query = em.createQuery("select m.username, 'HELLO', TRUE from Member m"
+//				+ "where m.type = :userType"
+//			);
+//		query.setParameter("userType", RoleType.ADMIN);
+		
+		// List<Object[]> result 
+//		List<Object[]> result = query.getResultList();
+//		for(Object[] objects : result) {
+//			System.out.println("objects = " + objects[0]);
+//		}
+		
+		// 2. Object[] 타입으로 조회
+		List resultList = em.createQuery("select m.username, m.age from Member m").getResultList();
+		
+		Object o = resultList.get(0);
+		Object[] resultOb = (Object[]) o;
+		System.out.println("result0 = " + resultOb[0]); // member1
+		System.out.println("result1 = " + resultOb[1]); // 10
+		
+		List<Object[]> resultList2 = em.createQuery("select m.username, m.age from Member m").getResultList();
+		Object[] resultOb2 = resultList2.get(0);
+		System.out.println("result0 = " + resultOb2[0]); // member1
+		System.out.println("result1 = " + resultOb2[1]); // 10
+		
+		// 3. new 명령어로 조회 ; 가장 깔끔하다 -> 단순 값을 DTO로 바로 조회
+		//List<MeberDTO> result = em.createQuery("select new jpql.MemberDTO(m.username, m.age) from MemberDTO m ", MemberDTO.class).getResultList();
+		List<MemberDTO> resultList3 = em.createQuery("select new jpa.basic.example.MemberDTO(m.username, m.age) from Member m ", MemberDTO.class).getResultList();
+		
+		MemberDTO memberDTO = resultList3.get(0);
+		System.out.println("memberDTO0 = " + memberDTO.getUsername()); // member1
+		System.out.println("memberDTO1 = " + memberDTO.getAge()); // 10
+
+//		주의점: 엔티티가 아니기 때문에 new 키워드를 사용해 생성자를 사용하듯이 해야한다
+//		패키지 경로를 다 적어줘야 한다(queryDSL에서는 import가능)
+//		DTO에 생성자 만들어 줘야한다 (타입 순서 맞게)
+		
+	}
+	
+	// 조건식
+	public void caseTest() {
+		String query = "select" + 
+							"	case when m.age <= 10 then '학생요금'" +
+							"	when m.age >= 60 then '경로요금'" +
+							"	else '일반요금'" +
+							"	end" +
+						"	from Member m";
+		List<String> result = em.createQuery(query, String.class).getResultList();
+		
+		query = "select coalease(m.username, '이름 없는 회원') from Member m";
+		result = em.createQuery(query, String.class).getResultList();
+	}
+	
+	// JPQL 기본 함수
+	public void fnTest() {
+		String query = "select concat('a', 'b') from Member m";
+		// "substring(m.username, 2, 3)"
+		// "locate('de', 'abcdefg')"
+		// trim, lower, upper, length, abs, sqrt, mod, 
+		// size, index (JPA 용도)
 	}
 }
