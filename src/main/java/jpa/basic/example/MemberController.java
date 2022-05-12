@@ -15,6 +15,11 @@ public class MemberController {
 	public void createMember() {
 //		mr.createMember();
 //		mr.createParentWithChild();
-		mr.findMember();
+//		mr.findMember();
+	}
+	
+	@GetMapping("/jpqlTest")
+	public void jpqlTest() {
+		
 	}
 }

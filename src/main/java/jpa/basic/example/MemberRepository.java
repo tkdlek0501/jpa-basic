@@ -3,6 +3,9 @@ package jpa.basic.example;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional
 public class MemberRepository {
 	
 	private final EntityManager em;
@@ -68,4 +72,37 @@ public class MemberRepository {
 	// TODO: 동적쿼리 처리는 QueryDSL 을 사용하자
 	// www.querydsl.com
 	// JPQL 사용법만 잘 익히면 QueryDSL 익히기 쉽다. JPQL이 먼저!
+	
+	public void jpqlTest() {
+		Member member = new Member();
+		member.setAge(10);
+		member.setUsername("kim");
+		em.persist(member);
+		
+		TypedQuery<Member> query = em.createQuery("select m from Member m", Member.class);
+//		TypedQuery<String> query2 = em.createQuery("select m.username from Member m", String.class);
+//		Query query3 = em.createQuery("select m.username, m.age from Member m");
+		
+		Member result = query.getSingleResult(); // 결과가 무조건 하나일 때; 없거나 여러개이면 exception 발생
+		// Spring Data JPA -> try-catch로 잡아주는 처리를 해줌 
+		System.out.println("result : " + result); 
+		// getResultList(); // 결과가 없을 땐 빈 리스트 반환
+	}
+	
+	public void paging() {
+		Member member = new Member();
+		member.setAge(10);
+		member.setUsername("kim");
+		em.persist(member);
+		
+		em.flush();
+		em.clear();
+		
+		List<Member> result = em.createQuery("select m from Member m order by m.age desc", Member.class)
+			.setFirstResult(0)
+			.setMaxResults(10)
+			.getResultList();
+		
+		System.out.println("result.size = " + result.size());
+	}
 }
