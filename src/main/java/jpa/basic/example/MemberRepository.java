@@ -90,10 +90,12 @@ public class MemberRepository {
 	}
 	
 	public void paging() {
-		Member member = new Member();
-		member.setAge(10);
-		member.setUsername("kim");
-		em.persist(member);
+		for(int i=0;i<100;i++) {
+			Member member = new Member();
+			member.setAge(i);
+			member.setUsername("member" + i);
+			em.persist(member);
+		}
 		
 		em.flush();
 		em.clear();
@@ -104,5 +106,42 @@ public class MemberRepository {
 			.getResultList();
 		
 		System.out.println("result.size = " + result.size());
+	}
+	
+	public void join() {
+		Team team = new Team();
+		team.setName("teamA");
+		em.persist(team);
+		
+		Member member = new Member();
+		member.setAge(10);
+		member.setUsername("member1");
+		member.changeTeam(team);
+		em.persist(member);
+		
+		// inner join
+		String innerQuery = "select m from Member m inner join m.team t";
+		List<Member> result1 = em.createQuery(innerQuery, Member.class)
+				.getResultList();
+		
+		// left outer join
+		String leftOuterQuery = "select m from Member m left join m.team t";
+		List<Member> result2 = em.createQuery(leftOuterQuery, Member.class)
+				.getResultList();
+		
+		// cross join
+		String thetaQuery = "select m from Member m, Team t where m.username = t.name";
+		List<Member> result3 = em.createQuery(thetaQuery, Member.class)
+				.getResultList();
+		
+		// on 
+		String onQuery = "select m, t from Member m left join m.team t on t.name";
+		List<Member> result4 = em.createQuery(onQuery, Member.class)
+				.getResultList();
+		
+		// 외부 조인
+		String outQuery = "select m, t from Member m left join Team t on m.usernmae = t.name";
+		
+		
 	}
 }
