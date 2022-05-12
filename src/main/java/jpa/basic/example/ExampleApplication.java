@@ -2,6 +2,13 @@ package jpa.basic.example;
 
 
 
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -10,7 +17,10 @@ import lombok.RequiredArgsConstructor;
 
 @SpringBootApplication
 @RequiredArgsConstructor
+@PersistenceContext
 public class ExampleApplication {
+	@Autowired
+	static EntityManager em;
 	
 	public static void main(String[] args) {
 		

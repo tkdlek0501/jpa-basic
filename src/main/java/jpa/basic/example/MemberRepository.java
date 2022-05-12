@@ -1,5 +1,7 @@
 package jpa.basic.example;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.stereotype.Repository;
@@ -35,4 +37,35 @@ public class MemberRepository {
 		em.persist(parent);
 	}
 	
+	public void findMember() {
+		
+		List<Member> result = em.createQuery(
+			"select m from Member m where m.username like '%kim%'", Member.class
+		).getResultList();
+		
+		for(Member member : result) {
+			System.out.println("member : " + member);
+		}
+		
+		//동적쿼리를 위한 Criteria 사용 준비 -> 길어지면 작성 어렵지만 컴파일 시점에 오류를 잡을 수 있고 동적쿼리 짜기 쉽다
+		// 실무에서 알아보기 어려워 유지보수 하기 쉽지 않다; 실용성이 없다
+//		CriteriaBuilder cb = em.getCriteriaBuilder();
+//		CriteriaQuery<Member> query = cb.createQuery(Member.class);
+//		
+//		Root<Member> m = query.from(Member.class);
+//		
+//		CriteriaQuery<Member> cq = query.select(m).where(cb.equal(m.get("username"), "kim"));
+//		List<Member> resultList = em.createQuery(cq).getResultList();
+//	
+//		for(Member cMember : resultList) {
+//			System.out.println("criteria member : " + cMember);
+//		}
+		
+		// 네이티브 SQL -> 이것보다 차라리 mybatis 이용하는 게 낫다
+		//em.createNativeQuery("select member_id, city, street from member", Member.class).getResultList();
+	}
+	
+	// TODO: 동적쿼리 처리는 QueryDSL 을 사용하자
+	// www.querydsl.com
+	// JPQL 사용법만 잘 익히면 QueryDSL 익히기 쉽다. JPQL이 먼저!
 }
