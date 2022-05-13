@@ -22,4 +22,9 @@ public class MemberController {
 	public void jpqlTest() {
 		mr.type();
 	}
+	
+	@GetMapping("/fetchJoinTest")
+	public void fetchJoinTest() {
+		mr.fetchJoinTest();
+	}
 }

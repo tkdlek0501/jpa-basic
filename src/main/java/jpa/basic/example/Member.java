@@ -65,6 +65,13 @@ public class Member {
 	
 	@Lob // DB에 varchar 를 넘어서는 용량을 넣기 위한 애노테이션
 	private String description;
+
+	@Override
+	public String toString() {
+		return "Member [id=" + id + ", username=" + username + ", age=" + age + ", roleType=" + roleType
+				+ ", createDate=" + createDate + ", lastModifiedDate=" + lastModifiedDate + ", description="
+				+ description + "]";
+	}
 	
 }
 

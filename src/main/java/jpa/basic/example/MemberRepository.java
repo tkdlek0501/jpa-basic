@@ -7,6 +7,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
+import org.hibernate.mapping.Collection;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -241,4 +242,115 @@ public class MemberRepository {
 		// trim, lower, upper, length, abs, sqrt, mod, 
 		// size, index (JPA 용도)
 	}
+	
+	
+// =============================================================================	
+	
+	// TODO: fetch join
+	public void fetchJoinTest() {
+		Team teamA = new Team();
+		teamA.setName("팀A");
+		em.persist(teamA);
+		
+		Team teamB = new Team();
+		teamB.setName("팀B");
+		em.persist(teamB);
+		
+		Member member1 = new Member();
+		member1.setUsername("회원1");
+		member1.setTeam(teamA);
+		em.persist(member1);
+		
+		Member member2 = new Member();
+		member2.setUsername("회원2");
+		member2.setTeam(teamA);
+		em.persist(member2);
+		
+		Member member3 = new Member();
+		member3.setUsername("회원3");
+		member3.setTeam(teamB);
+		em.persist(member3);
+		
+		em.flush();
+		em.clear();
+		
+		// fetch join 사용 전
+//		String query = "select m from Member m";
+//		
+//		List<Member> result = em.createQuery(query, Member.class)
+//				.getResultList();
+//		
+//		for(Member member : result) {
+//			System.out.println("member : " + member.getUsername() + " , " + member.getTeam().getName());
+//		}
+		// 회원1, 팀A(SQL에서 조회)
+		// 회원2, 팀A(1차 캐시에서 조회)
+		// 회원3, 팀B(SQL에서 조회)
+		// N + 1 문제 발생
+		
+		// fetch join 사용 후
+		String query = "select m from Member m join fetch m.team";
+		
+		List<Member> result = em.createQuery(query, Member.class)
+				.getResultList();
+		
+		for(Member member : result) {
+			System.out.println("member : " + member.getUsername() + " , " + member.getTeam().getName());
+		}
+		// SQL에 inner join으로 한 번에 조회 후 영속성 컨텍스트에 한 번에 들어감
+		// team객체는 프록시가 아니라 실제 객체
+		
+		// 주의점
+		// 다:1 은 문제가 없지만
+		// 1:다 관계에서 데이터가 중복돼서 가져올 수 있다 (team 입장에서 member join하면 같은 team이 중복되는 경우)
+		// JPQL의 DISTINCT 를 사용해서 해결할 수 있다
+		// 기능: 1. SQL의 distinct 추가(완전 중복되는 row를 하나로), 2. 같은 식별자 가진 엔티티 중복 제거
+		// distinct 적용 전
+		String teamQuery = "select t from Team t join fetch t.members";
+		
+		List<Team> teamResult = em.createQuery(teamQuery, Team.class)
+				.getResultList();
+		
+		System.out.println("teamResult : " + teamResult.size()); // team이 2개인데 member는 3개라서 3
+		for(Team team : teamResult) {
+			System.out.println("team : " + team.getName() + " , members.size" + team.getMembers().size());
+			for(Member member : team.getMembers()) {
+				System.out.println("-> member = " + member);
+			}
+		}
+		
+		// distinct 적용 후 
+		String distinctTeamQuery = "select distinct t from Team t join fetch t.members";
+		
+		List<Team> distinctTeamResult = em.createQuery(distinctTeamQuery, Team.class)
+				.getResultList();
+		
+		System.out.println("distinctTeamResult.size : " + distinctTeamResult.size()); // 2
+		for(Team team : distinctTeamResult) {
+			System.out.println("team : " + team.getName() + " , members.size" + team.getMembers().size());
+			for(Member member : team.getMembers()) {
+				System.out.println("-> member = " + member);
+			}
+		}
+		
+		// TODO: fetch join 과 일반 join의 차이
+		// 일반 join 은 실행시 연관된 엔티티를 함께 조회하지 않음
+		// JPQL 은 결과 반환시 연관 관계 고려 x, 단지 select 절에 지정한 엔티티만 조회한다
+		// 팀 엔티티만 조회하고, 회원 엔티티는 조회 x
+		// fetch join 사용할 때만 연관된 엔티티도 함께 조회되는 것(즉시 로딩)
+		// 요약: JPQL에서는 fetch join을 사용할 때만 연관된 엔티티를 함께 조회한다 (그냥 join은 연관 관계 고려 x)
+		// 또한 fetch join은 즉시 로딩이다
+		
+		// TODO: fetch join의 특징과 한계
+		// 1. fetch join 대상에는 별칭을 줄 수 없다
+		// ex. fetch join t.members m  이렇게 별칭(as) 주고
+		// where 절에 m.age > 10 이런 조건을 주는 것은 안된다
+		// 왜냐하면 team으로 부터 member 탐색시 member 전체가 조회되는 게 아니라 일부만 조회돼서 탐색에 누락이 생겨버린다
+		// 객체 그래프를 탐색한다는 것은 전체를 조회한다는 개념 따라서 일부만 가져오고 싶다면 fetch join이 아니라 아예 따로 쿼리를 날려야 한다 
+		// 2. 둘 이상의 컬렉션은 fetch join 할 수 없다
+		// 1:다 도 데이터 중복이 생기는데 둘 이상이면 예상하기 어려운 join이 돼버린다
+		// 3. 컬렉션(1:다) fetch join 하면 페이징 API 쓸 수 없다 (1:1, 다:1 은 페이징 가능)
+	}
+	
+	
 }
