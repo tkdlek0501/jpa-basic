@@ -27,4 +27,19 @@ public class MemberController {
 	public void fetchJoinTest() {
 		mr.fetchJoinTest();
 	}
+	
+	@GetMapping("/entity")
+	public void entity() {
+		mr.entity();
+	} 
+	
+	@GetMapping("/namedQuery")
+	public void namedQuery() {
+		mr.namedQuery();
+	}
+	
+	@GetMapping("/bulk")
+	public void bulk() {
+		mr.bulk();
+	}
 }

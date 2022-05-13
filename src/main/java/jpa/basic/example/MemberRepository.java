@@ -352,5 +352,134 @@ public class MemberRepository {
 		// 3. 컬렉션(1:다) fetch join 하면 페이징 API 쓸 수 없다 (1:1, 다:1 은 페이징 가능)
 	}
 	
+	// 엔티티 직접 사용
+	public void entity() {
+		Team teamA = new Team();
+		teamA.setName("팀A");
+		em.persist(teamA);
+		
+		Team teamB = new Team();
+		teamB.setName("팀B");
+		em.persist(teamB);
+		
+		Member member1 = new Member();
+		member1.setUsername("회원1");
+		member1.setTeam(teamA);
+		em.persist(member1);
+		
+		Member member2 = new Member();
+		member2.setUsername("회원2");
+		member2.setTeam(teamA);
+		em.persist(member2);
+		
+		Member member3 = new Member();
+		member3.setUsername("회원3");
+		member3.setTeam(teamB);
+		em.persist(member3);
+		
+		em.flush();
+		em.clear();
+		
+		String query = "select m from Member m where m = :member";
+		
+		Member result = em.createQuery(query, Member.class)
+				.setParameter("member", member1)
+				.getSingleResult();
+		
+		// sql) select m from member m where m.id = member.id
+		
+		System.out.println("findMember : " + result);
+		
+		String teamQuery = "select m from Member m where m.team = :team";
+		
+		List<Member> result2 = em.createQuery(teamQuery, Member.class)
+				.setParameter("team", teamA)
+				.getResultList();
+		
+		for (Member member : result2) {
+			System.out.println("member : " + member);
+		}
+	}
 	
+	// namedQuery
+	public void namedQuery() {
+		Team teamA = new Team();
+		teamA.setName("팀A");
+		em.persist(teamA);
+		
+		Team teamB = new Team();
+		teamB.setName("팀B");
+		em.persist(teamB);
+		
+		Member member1 = new Member();
+		member1.setUsername("회원1");
+		member1.setTeam(teamA);
+		em.persist(member1);
+		
+		Member member2 = new Member();
+		member2.setUsername("회원2");
+		member2.setTeam(teamA);
+		em.persist(member2);
+		
+		Member member3 = new Member();
+		member3.setUsername("회원3");
+		member3.setTeam(teamB);
+		em.persist(member3);
+		
+		em.flush();
+		em.clear();
+		
+		// Member 클래스에 정의한 namedQuery 문을 가져와서 쓸 수 있음
+		// spring data jpa 에서는 @Query를 사용해서 메서드 위에 선언 가능
+		em.createNamedQuery("Member.findByUsername", Member.class)
+			.setParameter("username", "회원1")
+			.getResultList();
+	}
+	
+	// bulk 연산
+	public void bulk() {
+		Team teamA = new Team();
+		teamA.setName("팀A");
+		em.persist(teamA);
+		
+		Team teamB = new Team();
+		teamB.setName("팀B");
+		em.persist(teamB);
+		
+		Member member1 = new Member();
+		member1.setUsername("회원1");
+		member1.setAge(0);
+		member1.setTeam(teamA);
+		em.persist(member1);
+		
+		Member member2 = new Member();
+		member2.setUsername("회원2");
+		member2.setAge(0);
+		member2.setTeam(teamA);
+		em.persist(member2);
+		
+		Member member3 = new Member();
+		member3.setUsername("회원3");
+		member3.setAge(0);
+		member3.setTeam(teamB);
+		em.persist(member3);
+		
+//		em.flush();
+//		em.clear();
+		
+		// flush  자동 호출
+		int resultCount = em.createQuery("update Member m set m.age = 20")
+			.executeUpdate(); //DB에는 반영 되지만 영속성 컨텍스트에는 반영되지 않음
+		
+		System.out.println("resultCount : " + resultCount);
+		
+		Member findMember1 = em.find(Member.class, member1.getId());
+		
+		System.out.println("before member1.getAge() : " + findMember1.getAge());
+		
+		em.clear(); // 영속성 컨텍스트 초기화
+		
+		Member findMember2 = em.find(Member.class, member1.getId());
+		System.out.println("after member1.getAge() : " + findMember2.getAge());
+	}
 }

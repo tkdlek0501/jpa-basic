@@ -13,7 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -21,6 +21,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity // jpa가 관리하는 클래스라는 것을 인식 시킴
+@NamedQuery(
+	name = "Member.findByUsername",
+	query = "select m from Member m where m.username = :username"
+)
 @Getter
 @Setter
 public class Member {
